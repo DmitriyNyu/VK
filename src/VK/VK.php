@@ -242,20 +242,26 @@ class VK
      * Executes request on link.
      * @param   string $url
      * @param   string $method
-     * @param   array $postfields
+     * @param   array $postFields
      * @return  string
      */
-    private function request($url, $method = 'GET', $postfields = array())
+    private function request($url, $method = 'GET', $postFields = array())
     {
-        curl_setopt_array($this->ch, array(
+        $options = array(
             CURLOPT_USERAGENT => 'VK/1.0 (+https://github.com/vladkens/VK))',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_POST => ($method == 'POST'),
-            CURLOPT_POSTFIELDS => $postfields,
+            CURLOPT_HTTPGET => true,
             CURLOPT_URL => $url
-        ));
-
+        );
+        if($method === 'POST') {
+            $options = array_merge($options, array(
+                CURLOPT_HTTPGET => false,
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $postFields
+            ));
+        }
+        curl_setopt_array($this->ch, $options);
         return curl_exec($this->ch);
     }
 
